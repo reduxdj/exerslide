@@ -61,6 +61,35 @@ class SlideStore extends EventEmitter {
   getCurrentIndex() {
     return this._currentIndex;
   }
+
+  getSlideAt(index) {
+    return this._slides[index];
+  }
+
+  getSlides() {
+    return this._slides;
+  }
+
+  /**
+   * Returns something like.
+   *
+   * [{}, {}, [{}, {}, {}], {}]
+   */
+  getSlidesGroupedByChapter() {
+    let chapters = {};
+    let grouped = [];
+    this._slides.forEach(slide => {
+      if (!slide.chapter) {
+        grouped.push(slide);
+      } else {
+        if (!chapters[slide.chapter]) {
+          grouped.push(chapters[slide.chapter] = []);
+        }
+        chapters[slide.chapter].push(slide);
+      }
+    });
+    return grouped;
+  }
 }
 
 export default new SlideStore();

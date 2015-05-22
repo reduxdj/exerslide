@@ -1,6 +1,10 @@
 import React from 'react';
 
 export default class Slide extends React.Component {
+  static getClassNames() {
+    return '';
+  }
+
   render() {
     let children;
     if (React.Children.count(this.props.children) > 0) {

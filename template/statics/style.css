@@ -20,6 +20,75 @@ pre {
   font-size: 0.8em;
 }
 
+/* Progress */
+
+#progress {
+  padding-top: 10px;
+  display: flex;
+  flex-direction: row;
+}
+
+#progress::before {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  content: " ";
+  height: 0;
+  border: 1px solid #EFEFEF;
+  z-index: 0;
+}
+
+#progress > .chapter {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  z-index: 10;
+}
+
+#progress > .chapter > .title {
+  text-align: center;
+}
+
+#progress > .chapter > .indicators {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+#progress .indicator {
+  background-color: #DDD;
+  width: 15px;
+  height: 15px;
+  border-radius: 100%;
+}
+
+#progress .indicator.javascriptExercise {
+  background-color: #ffba3d
+}
+
+#progress .indicator.javascriptExercise.error {
+  background-color: red;
+}
+
+#progress .indicator.javascriptExercise.completed {
+  background-color: green;
+}
+
+#progress .indicator.active {
+  background-color: #3c5bff;
+}
+
+
+#progress .indicator > span {
+  display: none;
+}
+
+#progress > .chapter > a {
+  display: block;
+}
+
 /* MAIN CONTENT */
 
 #slide {

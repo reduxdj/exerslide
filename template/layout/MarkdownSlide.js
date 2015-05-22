@@ -1,13 +1,18 @@
 import React from 'react';
 import Slide from './Slide';
-import kramed from 'kramed';
+import Markdown from '../js/Markdown';
+import classnames from 'classnames';
 
 export default class MarkdownSlide extends React.Component {
+  static getClassNames(slideIndex) {
+    return classnames(Slide.getClassNames(slideIndex), 'markdown');
+  }
+
   render() {
     return (
       <Slide
-        title={this.props.title}
-        content={kramed(this.props.content)}
+        {...this.props}
+        content={Markdown.parse(this.props.content)}
       />
     );
   }

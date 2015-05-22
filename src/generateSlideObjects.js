@@ -12,6 +12,8 @@ const TYPE_LAYOUT_MAP = Object.assign(Object.create(null), {
   '.md': 'MarkdownSlide'
 });
 
+const fileTypes = new Set(['.js', '.html', '.md', '.txt']);
+
 function readFolder(folderPath, withSubfolders=false) {
   return fs.readdirAsync(folderPath)
     .then(_.sort)
@@ -20,7 +22,7 @@ function readFolder(folderPath, withSubfolders=false) {
       return fs.statAsync(filePath).then(stat => {
         if (withSubfolders && stat.isDirectory()) {
           return readFolder(filePath);
-        } else if (stat.isFile()) {
+        } else if (stat.isFile() && fileTypes.has(path.extname(fileName))) {
           return fs.readFileAsync(filePath, {encoding: 'utf-8'})
             .then(fileContent => ({fileContent, fileName}));
         }
@@ -32,13 +34,24 @@ function readFolder(folderPath, withSubfolders=false) {
 function parseFile(fileContent) {
   // try to find YAML front matter
   if (DIVIDER.test(fileContent)) {
-    let [frontMatter, content] = fileContent.split(DIVIDER);
-    let slide = {};
-    try {
-      slide = yaml.load(frontMatter);
-    } finally {
-      slide.content = content;
+    let frontMatter = '';
+    let content = '';
+    let match = DIVIDER.exec(fileContent);
+    if (match) {
+      frontMatter = fileContent.substr(0, match.index);
+      content = fileContent.substr(match.index + match[0].length);
+    } else {
+      content = fileContent;
     }
+    let slide = {};
+    if (frontMatter) {
+      try {
+        slide = yaml.load(frontMatter);
+      } catch(e) {
+        slide = {};
+      }
+    }
+    slide.content = content;
     return slide;
   }
   return {content: fileContent};
@@ -71,10 +84,10 @@ export default function generateSlideObjects(folderPath) {
     .map(file => {
       if (Array.isArray(file)) {
         let slides = file.map(fileToSlide);
-        let chapterName = slides[0].chapterName || 'Chapter ' + chapterIndex++;
+        let chapter = slides[0].chapter || 'Chapter ' + chapterIndex++;
         slides.map(slide => {
-          if (!slide.chapterName) {
-            slide.chapterName = chapterName;
+          if (!slide.chapter) {
+            slide.chapter = chapter;
           }
           return slide;
         });

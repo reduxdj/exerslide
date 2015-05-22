@@ -1,7 +1,9 @@
-import React from 'react';
-import Actions from './Actions';
-import SlideStore, {EVENTS} from './SlideStore';
 import * as Layout from '${LAYOUTS_FILE}';
+import Actions from './Actions';
+import Progress from './Progress';
+import React from 'react';
+import SlideStore, {EVENTS} from './SlideStore';
+import {getLayoutForSlide} from './LayoutHelper';
 import {keypress} from 'keypress';
 
 let fs = require('fs'); // to make brfs happy
@@ -23,7 +25,8 @@ class App extends React.Component {
     SlideStore.on(EVENTS.CHANGE, () => {
       this.setState({
         currentIndex: SlideStore.getCurrentIndex(),
-        currentSlide: SlideStore.getCurrentSlide()
+        currentSlide: SlideStore.getCurrentSlide(),
+        slides: SlideStore.getSlides()
       });
     });
 
@@ -58,13 +61,18 @@ class App extends React.Component {
       );
     }
 
-    let Slide = Layout[this.state.currentSlide.layout];
-
+    let Layout = getLayoutForSlide(this.state.currentSlide);
     return (
-      <Slide
-        {...this.state.currentSlide}
-        slideIndex={this.state.currentIndex}
-      />
+      <div>
+        <Progress
+          slideIndex={this.state.currentIndex}
+          slides={this.state.slides}
+        />
+        <Layout
+          {...this.state.currentSlide}
+          slideIndex={this.state.currentIndex}
+        />
+      </div>
     );
   }
 }

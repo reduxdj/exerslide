@@ -1,10 +1,11 @@
 /*eslint no-new-func: 0, new-cap: 0*/
+import Editor from '../js/Editor';
+import Immutable from 'immutable';
+import Markdown from '../js/Markdown';
 import React from 'react';
 import Slide from './Slide';
-import Editor from '../js/Editor';
-import kramed from 'kramed';
-import Immutable from 'immutable';
 import chai from 'chai';
+import classnames from 'classnames';
 import withoutComments from '../js/withoutComments';
 
 import 'codemirror/mode/javascript/javascript';
@@ -34,6 +35,18 @@ function log() {
 global.log = log;
 
 export default class JavaScriptExercise extends React.Component {
+
+  static getClassNames(slideIndex) {
+    let exercise = cache.get(slideIndex);
+    return classnames(
+      Slide.getClassNames(slideIndex),
+      {
+        javascriptExercise: true,
+        completed: exercise && exercise.completed,
+        error: exercise && exercise.error
+      }
+    );
+  }
 
   constructor(props) {
     super(props);
@@ -115,7 +128,9 @@ export default class JavaScriptExercise extends React.Component {
     if (this.props.description) {
       description =
         <div
-          dangerouslySetInnerHTML={{__html: kramed(this.props.description)}}
+          dangerouslySetInnerHTML={
+            {__html: Markdown.parse(this.props.description)}
+          }
         />;
     }
     let exercise = this.state.exercise;
