@@ -26,6 +26,7 @@ pre {
   padding-top: 10px;
   display: flex;
   flex-direction: row;
+  align-items: flex-start;
 }
 
 #progress::before {
@@ -40,6 +41,7 @@ pre {
 }
 
 #progress > .chapter {
+  padding: 0 20px;
   flex-grow: 1;
   display: flex;
   flex-direction: column-reverse;
@@ -52,12 +54,21 @@ pre {
 }
 
 #progress > .chapter > .indicators {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
 }
 
+#progress > .chapter > .indicators > li {
+  list-style: none;
+  margin: 0;
+}
+
 #progress .indicator {
+  display: block;
   background-color: #DDD;
   width: 15px;
   height: 15px;
@@ -96,7 +107,6 @@ pre {
   right: 0;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 20px;
   width: 80%;
   padding: 20px;
   top: 0;

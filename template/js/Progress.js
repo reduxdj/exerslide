@@ -40,11 +40,13 @@ export default class Progress extends React.Component {
       let indicators;
       if (Array.isArray(chapter)) {
         indicators = chapter.map((slide, index) =>
-          <Indicator
-            key={slideIndex + index}
-            slideIndex={slideIndex + index}
-            active={this.props.slideIndex === slideIndex + index}
-          />
+          <li>
+            <Indicator
+              key={slideIndex + index}
+              slideIndex={slideIndex + index}
+              active={this.props.slideIndex === slideIndex + index}
+            />
+          </li>
         );
         slideIndex += chapter.length;
       } else {
@@ -61,7 +63,7 @@ export default class Progress extends React.Component {
           <div className="title">
             {Array.isArray(chapter) ? chapter[0].chapter : chapter.title}
           </div>
-          <div className="indicators">{indicators}</div>
+          <ul className="indicators">{indicators}</ul>
         </div>
       );
   });
