@@ -1,6 +1,9 @@
 import React from 'react';
 import CodeMirror from 'codemirror';
 
+/**
+ * @css ../../node_modules/codemirror/lib/codemirror.css
+ */
 export default class Editor extends React.Component {
   constructor(props) {
     super(Object.assign({defaultValue: ''}, props));

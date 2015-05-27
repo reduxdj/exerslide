@@ -7,11 +7,6 @@ import _ from 'lodash';
 
 const DIVIDER = /^-{3,}\n+/m;
 const DEFAULT_LAYOUT = 'Slide';
-const TYPE_LAYOUT_MAP = Object.assign(Object.create(null), {
-  '.js': 'JavaScriptExercise',
-  '.md': 'MarkdownSlide'
-});
-
 const fileTypes = new Set(['.js', '.html', '.md', '.txt']);
 
 function readFolder(folderPath, withSubfolders=false) {
@@ -57,14 +52,14 @@ function parseFile(fileContent) {
   return {content: fileContent};
 }
 
-function detectLayoutFromFileName(fileName) {
-  return TYPE_LAYOUT_MAP[path.extname(fileName)] || DEFAULT_LAYOUT;
+function detectLayoutFromFileName(fileName, defaultLayouts) {
+  return defaultLayouts[path.extname(fileName)] || DEFAULT_LAYOUT;
 }
 
-function fileToSlide({fileName, fileContent}) {
+function fileToSlide({fileName, fileContent}, defaultLayouts) {
   let slide = parseFile(fileContent);
   if (!slide.layout) {
-    slide.layout = detectLayoutFromFileName(fileName);
+    slide.layout = detectLayoutFromFileName(fileName, defaultLayouts);
   }
   return slide;
 }
@@ -78,15 +73,15 @@ function fileToSlide({fileName, fileContent}) {
  *
  * @param {string} folderPath Path to the folder containing all slides
  */
-export default function generateSlideObjects(folderPath) {
+export default function generateSlideObjects(folderPath, defaultLayouts) {
   let chapterIndex = 1;
   return readFolder(folderPath, true)
     .map(file => {
       if (Array.isArray(file)) {
-        let slides = file.map(fileToSlide);
+        let slides = file.map(file => fileToSlide(file, defaultLayouts));
         let chapter = slides[0].chapter || 'Chapter ' + chapterIndex++;
         slides.map(slide => {
-          if (!slide.chapter) {
+          if (!slide.chapter && !slide.single) {
             slide.chapter = chapter;
           }
           return slide;

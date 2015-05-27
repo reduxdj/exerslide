@@ -1,10 +1,10 @@
 import * as Layout from '${LAYOUTS_FILE}';
 import Actions from './Actions';
-import Progress from './Progress';
 import React from 'react';
 import SlideStore, {EVENTS} from './SlideStore';
 import {getLayoutForSlide} from './LayoutHelper';
 import {keypress} from 'keypress';
+import MasterLayout from '${MASTER_LAYOUT_PATH}';
 
 let fs = require('fs'); // to make brfs happy
 
@@ -64,14 +64,14 @@ class App extends React.Component {
     let Layout = getLayoutForSlide(this.state.currentSlide);
     return (
       <div>
-        <Progress
+        <MasterLayout
           slideIndex={this.state.currentIndex}
-          slides={this.state.slides}
-        />
-        <Layout
-          {...this.state.currentSlide}
-          slideIndex={this.state.currentIndex}
-        />
+          slides={this.state.slides}>
+          <Layout
+            {...this.state.currentSlide}
+            slideIndex={this.state.currentIndex}
+          />
+       </MasterLayout>
       </div>
     );
   }
