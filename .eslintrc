@@ -3,7 +3,8 @@
   "rules": {
     "strict": 0,
     "no-underscore-dangle": 0,
-    "no-shadow": 0
+    "no-shadow": 0,
+    "not-process-exit": 0
   },
   "env": {
     "node": true
