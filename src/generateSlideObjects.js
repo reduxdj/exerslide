@@ -1,12 +1,9 @@
-import Promise from 'bluebird';
 import fs from 'fs';
 import path from 'path';
-import yaml from 'yaml-js'
+import yaml from 'yaml-js';
 import _ from 'lodash';
 
-
 const DIVIDER = /^-{3,}\n+/m;
-const DEFAULT_LAYOUT = 'Slide';
 const fileTypes = new Set(['.js', '.html', '.md', '.txt']);
 
 function readFolder(folderPath, withSubfolders=false) {
@@ -53,7 +50,7 @@ function parseFile(fileContent) {
 }
 
 function detectLayoutFromFileName(fileName, defaultLayouts) {
-  return defaultLayouts[path.extname(fileName)] || DEFAULT_LAYOUT;
+  return defaultLayouts[path.extname(fileName)];
 }
 
 function fileToSlide({fileName, fileContent}, defaultLayouts) {

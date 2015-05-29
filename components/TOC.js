@@ -1,6 +1,6 @@
 import React from 'react';
-import SlideStore from './SlideStore';
-import {getLayoutForSlideAt} from './LayoutHelper';
+import SlideStore from '../js/SlideStore';
+import {getLayoutForSlideAt} from '../js/LayoutHelper';
 import classnames from 'classnames';
 
 class MenuItem extends React.Component {
@@ -12,7 +12,7 @@ class MenuItem extends React.Component {
   render() {
     let {slideIndex, slide, active} = this.props;
     let classes = {
-      menuItem: true,
+      slide: true,
       active
     };
     let Layout = getLayoutForSlideAt(slideIndex);
@@ -37,9 +37,6 @@ MenuItem.propTypes = {
   active: React.PropTypes.bool
 };
 
-/**
- * @css ../css/toc.css
- */
 export default class TOC extends React.Component {
   render() {
     let {slides} = this.props;
@@ -48,6 +45,8 @@ export default class TOC extends React.Component {
     chapters = chapters.map(chapter => {
       let menuItems;
       if (Array.isArray(chapter)) {
+        let isActive = this.props.slideIndex >= slideIndex &&
+          this.props.slideIndex < slideIndex + chapter.length;
         menuItems = chapter.map((slide, index) =>
           <MenuItem
             key={slideIndex + index}
@@ -57,11 +56,16 @@ export default class TOC extends React.Component {
           />
         );
         menuItems =
-          <li className="chapter">
-            <div className="title">
+          <li
+            key={chapter[0].chapter}
+            className={classnames({
+              chapter: true,
+              active: isActive
+            })}>
+            <h4 className="title">
               {chapter[0].chapter}
-            </div>
-            <ul className="menuItems">{menuItems}</ul>
+            </h4>
+            <ul className="slides">{menuItems}</ul>
           </li>;
         slideIndex += chapter.length;
       } else {
@@ -71,7 +75,7 @@ export default class TOC extends React.Component {
             slide={slides[slideIndex]}
             slideIndex={slideIndex}
             active={this.props.slideIndex === slideIndex}
-          />
+          />;
         slideIndex += 1;
       }
       return menuItems;

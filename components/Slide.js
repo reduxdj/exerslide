@@ -14,8 +14,14 @@ export default class Slide extends React.Component {
     }
 
     return (
-      <div id="slide">
-        {this.props.title ? <h2>{this.props.title}</h2> : null}
+      <div id="slide" className={this.props.className}>
+        {this.props.title ?
+          <h2
+            className="title"
+            dangerouslySetInnerHTML={{__html: this.props.title}}
+          /> :
+           null
+        }
         {children}
       </div>
     );
@@ -23,5 +29,6 @@ export default class Slide extends React.Component {
 };
 
 Slide.propTypes = {
+  title: React.PropTypes.string,
   content: React.PropTypes.string
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import TOC from './js/TOC.js';
+import TOC from '../components/TOC';
 
 /**
  * The master layout specifies the different parts of the page, e.g. the

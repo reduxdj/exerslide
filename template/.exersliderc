@@ -1,16 +1,19 @@
 {
-  "masterLayout": "./MasterLayout.js",
+  "masterLayout": "../components/MasterLayout.js",
   "layouts": [
-    "./layout/"
+    "../layouts/"
   ],
   "styles": [
     "http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css",
-    "./css/solarized_light.css",
-    "./css/style.css"
+    "css/solarized_light.css",
+    "css/style.css"
   ],
   "defaultLayouts": {
     ".js": "JavaScriptExercise",
     ".md": "Markdown"
   },
-  "statics": ["./statics/*"]
+  "statics": [
+    "index.html",
+    "SourceCodePro-regular.otf"
+  ]
 }

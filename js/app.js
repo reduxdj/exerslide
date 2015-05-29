@@ -1,10 +1,11 @@
 import * as Layout from '${LAYOUTS_FILE}';
 import Actions from './Actions';
 import React from 'react';
+import Slide from '../components/Slide';
 import SlideStore, {EVENTS} from './SlideStore';
+import MasterLayout from '${MASTER_LAYOUT_PATH}';
 import {getLayoutForSlide} from './LayoutHelper';
 import {keypress} from 'keypress';
-import MasterLayout from '${MASTER_LAYOUT_PATH}';
 
 let fs = require('fs'); // to make brfs happy
 
@@ -53,24 +54,37 @@ class App extends React.Component {
   }
 
   render() {
-    if (this.state.currentSlide == null) {
-      return (
-        <div className="loaderContainer">
-          <div className="spinner" />
-        </div>
-      );
+    let {currentSlide, currentIndex} = this.state;
+    if (currentSlide == null) {
+      return null;
     }
 
-    let Layout = getLayoutForSlide(this.state.currentSlide);
+    let Layout = getLayoutForSlide(currentSlide);
+    let content;
+    if (Layout) {
+      let classNames =
+        Layout.getClassNames && Layout.getClassNames(currentIndex);
+      content =
+        <Slide className={classNames} title={currentSlide.title}>
+          <Layout
+            {...currentSlide}
+            slideIndex={this.state.currentIndex}
+          />
+        </Slide>;
+    } else {
+      content =
+        <Slide
+          title={currentSlide.title}
+          content={currentSlide.content}
+        />;
+    }
+
     return (
       <div>
         <MasterLayout
           slideIndex={this.state.currentIndex}
           slides={this.state.slides}>
-          <Layout
-            {...this.state.currentSlide}
-            slideIndex={this.state.currentIndex}
-          />
+          {content}
        </MasterLayout>
       </div>
     );

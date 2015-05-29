@@ -1,9 +1,8 @@
 /*eslint no-new-func: 0, new-cap: 0*/
-import Editor from '../js/Editor';
+import Editor from '../components/Editor';
 import Immutable from 'immutable';
 import Markdown from '../js/Markdown';
 import React from 'react';
-import Slide from './Slide';
 import chai from 'chai';
 import classnames from 'classnames';
 import withoutComments from '../js/withoutComments';
@@ -38,14 +37,11 @@ export default class JavaScriptExercise extends React.Component {
 
   static getClassNames(slideIndex) {
     let exercise = cache.get(slideIndex);
-    return classnames(
-      Slide.getClassNames(slideIndex),
-      {
-        javascriptExercise: true,
-        completed: exercise && exercise.completed,
-        error: exercise && exercise.error
-      }
-    );
+    return classnames( {
+      javascriptExercise: true,
+      completed: exercise && exercise.completed,
+      error: exercise && exercise.error
+    });
   }
 
   constructor(props) {
@@ -148,7 +144,7 @@ export default class JavaScriptExercise extends React.Component {
         </div>;
     }
     return (
-      <Slide title={this.props.title}>
+      <div>
         {description}
         {this.props.solution}
         <Editor
@@ -181,7 +177,7 @@ export default class JavaScriptExercise extends React.Component {
           }
         </div>
         {message ? <div style={{marginTop: 20}}>{message}</div> : null}
-      </Slide>
+      </div>
     );
   }
 

@@ -15,8 +15,7 @@ Promise.promisifyAll(fs);
 tmp.setGracefulCleanup();
 
 const TEMPLATE_DIR = path.join(__dirname, '../template');
-const APP_FILE = path.join(TEMPLATE_DIR, 'js', 'app.js');
-const STATIC_DIR = path.join(TEMPLATE_DIR, 'statics');
+const APP_FILE = path.join(__dirname, '../js', 'app.js');
 
 const DEFAULT_OPTIONS = {
   config: {},
@@ -24,33 +23,40 @@ const DEFAULT_OPTIONS = {
   watch: false
 };
 
-function resolveLayouts(layouts, layoutDirs) {
-  return Promise.all(layouts).map(layout => {
-    layout = layout + '.js';
-    let layoutPath;
-    layoutDirs.some(dir => {
-      try {
-        fs.statSync(path.join(dir, layout));
-      } catch(err) {
-        if (err.toString().indexOf('no such file') === -1) {
-          throw err;
-        }
-        return false;
+async function resolveLayouts(layouts, layoutDirs) {
+  // Read layout dirs
+  let layoutFiles = await Promise.all(
+    layoutDirs.map(dir => fs.readdirAsync(dir).map(file => path.join(dir, file)))
+  );
+  layoutFiles = _.flatten(layoutFiles);
+
+  return layouts.map(layoutName => {
+    let layoutFile;
+    for (let i = 0; i < layoutFiles.length; i++) {
+      let basename = path.basename(layoutFiles[i]);
+      basename = basename.substr(0, basename.indexOf('.'));
+      if (basename === layoutName) {
+        layoutFile = layoutFiles[i];
+        break;
       }
-      layoutPath = path.join(dir, layout);
-      return true;
-    });
-    if (!layoutPath) {
+    }
+    if (!layoutFile) {
       throw new Error(
-        `Unable to find layout "${layout}" in ${layoutDirs.toString()}`
+        `Unable to find layout "${layoutName}" in ${layoutDirs.toString()}`
       );
     }
-    return layoutPath;
+    return layoutFile;
   });
 }
 
 function generateLayoutsFile(slides, layoutDirs) {
-  let layouts = _.uniq(slides.map(slide => slide.layout).sort(), true);
+  let layouts = _.uniq(
+    slides
+    .map(slide => slide.layout)
+    .filter(v => v)
+    .sort(),
+    true
+  );
   return resolveLayouts(layouts, layoutDirs).then(layoutPaths => {
     return layouts.reduce((lines, name, i) => {
       lines.push(
@@ -139,19 +145,18 @@ async function bundle(options) {
 
   if (options.watch) {
     // statics
-    watchFiles(STATIC_DIR, (event, f) => {
+    watchFiles(options.config.statics, (event, f) => {
       switch(event) {
         case 'add':
         case 'change':
           copyFiles(
-            STATIC_DIR,
-            [path.relative(STATIC_DIR, f)],
+            options.config.statics,
             options.outDir,
             c => _.template(c, data)()
           );
           break;
         case 'unlink':
-          deleteFiles([path.join(STATIC_DIR, path.relative(STATIC_DIR, f))]);
+          deleteFiles([path.join(options.outDir, path.basename(f))]);
           break;
       }
     });
@@ -181,4 +186,4 @@ export default function exerslide(options) {
   .catch(err => {
     throw err;
   });
-};
+};;

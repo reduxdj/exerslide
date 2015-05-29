@@ -1,17 +1,16 @@
+body {
+  font-family: Helvetica, sans-serif;
+}
+
+/* CODE */
 @font-face {
   font-family: 'source';
   src: url('SourceCodePro-Regular.otf');
 }
 
-body {
-  font-family: Helvetica, sans-serif;
-}
-
 code {
   font-family: source;
 }
-
-/* code */
 
 pre {
   border: none;
@@ -23,19 +22,60 @@ pre {
 /* MAIN CONTENT */
 
 #slide {
-  box-sizing: border-box;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  width: 80%;
-  padding: 10px;
-  top: 0;
-  font-size: 130%;
+  font-size: 140%;
+  left: 350px;
+  max-width: 940px;
+  padding: 20px;
+  position: absolute;
 }
 
-#slide h2 {
+#slide > .title,
+#slide > h2 {
+  margin: 20px 0;
   text-align: center;
 }
+
+#toc {
+  font-size: 120%;
+  position: fixed;
+  top: 0;
+  height: 100%;
+  left: 0;
+  padding-left: 10px;
+  padding-top: 10px;
+  overflow-y: auto;
+}
+
+#toc li {
+  list-style: none;
+}
+
+#toc .chapter {
+  margin-top: 15px;
+}
+
+#toc .chapter > .title {
+  font-weight: bold;
+}
+
+#toc .slide {
+  padding-bottom: 5px;
+}
+
+#toc .slides {
+  padding-left: 15px;
+}
+
+#toc .slide.active {
+  font-weight: bold;
+}
+
+#toc. .slide > a:active,
+#toc. .slide > a:focus {
+  text-decoration: none;
+}
+
+/* JavaScriptExercise */
 
 .CodeMirror {
   background-color: #f5f5f5;
