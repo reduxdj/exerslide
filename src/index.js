@@ -137,7 +137,11 @@ async function bundle(options) {
       data,
       options,
       options.watch ?
-        changedJSFiles => extractAndBundleCSSFiles(jsFiles.concat(changedJSFiles), data, options) :
+        changedJSFiles => extractAndBundleCSSFiles(
+          jsFiles.concat(changedJSFiles),
+          data,
+          options
+        ) :
         null
     )
   );

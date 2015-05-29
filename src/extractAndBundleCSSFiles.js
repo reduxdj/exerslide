@@ -55,6 +55,7 @@ function bundleCSS(filesToBundle, data, options) {
 }
 
 export default async function extractAndBundleCSSFiles(jsFiles, data, options) {
+  jsFiles = _.uniq(jsFiles);
   let cssFilePaths = await extractCSSPaths(
     jsFiles.filter(p => p.indexOf('node_modules/') === -1)
   );
