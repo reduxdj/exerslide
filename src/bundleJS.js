@@ -7,7 +7,13 @@ import watchify from 'watchify';
 import {logError, logWrite} from './log';
 
 function replaceTransform(data) {
-  return transformify(str => _.template(str)(data));
+  return transformify(str => {
+    try {
+      return _.template(str)(data);
+    } catch(ex) {
+      return str;
+    }
+  });
 }
 
 /**

@@ -5,7 +5,7 @@
   ],
   "styles": [
     "http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css",
-    "css/solarized_light.css",
+    "../vendor/highlight/styles/solarized_light.css",
     "css/style.css"
   ],
   "defaultLayouts": {

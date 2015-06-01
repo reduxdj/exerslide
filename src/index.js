@@ -176,7 +176,7 @@ export default function exerslide(options) {
 
   // Load default and project config
   return Promise.join(
-    findConfig(path.resolve(__dirname, '../template')),
+    findConfig(TEMPLATE_DIR),
     findConfig(options.path)
   )
   .then(([defaultConfig, projectConfig]) => {
@@ -190,4 +190,4 @@ export default function exerslide(options) {
   .catch(err => {
     throw err;
   });
-};;
+};
