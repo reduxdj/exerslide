@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import browserify from 'browserify';
+import envify from 'envify/custom';
 import fs from 'fs';
 import path from 'path';
 import transformify from 'transformify';
@@ -47,6 +48,9 @@ export default function bundleJS(data, options, watchCallback=()=>{}) {
           logWrite(BUNDLE);
         });
       });
+    } else {
+      b.transform({global: true}, envify({NODE_ENV: 'production'}))
+        .transform({global: true}, 'uglifyify');
     }
 
     b.bundle()
