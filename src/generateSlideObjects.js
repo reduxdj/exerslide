@@ -85,7 +85,7 @@ export default function generateSlideObjects(folderPath, defaultLayouts) {
         });
         return slides;
       }
-      return fileToSlide(file);
+      return fileToSlide(file, defaultLayouts);
     })
     .reduce(
       (list, content) => Array.isArray(content) ?
