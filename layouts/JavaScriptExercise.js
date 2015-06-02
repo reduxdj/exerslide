@@ -1,6 +1,6 @@
 /*eslint no-new-func: 0, new-cap: 0*/
+import Cache from '../js/SlideDataCache';
 import Editor from '../components/Editor';
-import Immutable from 'immutable';
 import Markdown from '../js/Markdown';
 import React from 'react';
 import chai from 'chai';
@@ -9,20 +9,13 @@ import withoutComments from '../js/withoutComments';
 
 import 'codemirror/mode/javascript/javascript';
 
+const CACHE_KEY = 'JavaScriptExercise';
 
-let ExerciseRecord = Immutable.Record({
+let defautExerciseData = {
   completed: false,
   error: null,
   code: ''
-});
-let cache = Immutable.Map();
-
-function ensure(index) {
-  if (!cache.has(index)) {
-    cache = cache.set(index, new ExerciseRecord());
-  }
-  return cache.get(index);
-}
+};
 
 function createAssertion(code) {
   return new Function('assert, source, output', code);
@@ -36,7 +29,7 @@ global.log = log;
 export default class JavaScriptExercise extends React.Component {
 
   static getClassNames(slideIndex) {
-    let exercise = cache.get(slideIndex);
+    let exercise = Cache.get(slideIndex, CACHE_KEY);
     return classnames( {
       javascriptExercise: true,
       completed: exercise && exercise.completed,
@@ -47,7 +40,7 @@ export default class JavaScriptExercise extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      exercise: ensure(props.slideIndex)
+      exercise: Cache.get(props.slideIndex, CACHE_KEY, defautExerciseData)
     };
   }
 
@@ -63,10 +56,12 @@ export default class JavaScriptExercise extends React.Component {
 
   reset() {
     this.refs.editor.setValue(this.props.content);
-    let exercise = this.state.exercise
-      .set('completed', false)
-      .set('error', '');
-    cache = cache.set(this.props.slideIndex, exercise);
+    let exercise = {
+      ...this.state.exercise,
+      completed: false,
+      error: ''
+    };
+    Cache.set(this.props.slideIndex, CACHE_KEY, exercise);
     this.setState({exercise});
   }
 
@@ -80,6 +75,7 @@ export default class JavaScriptExercise extends React.Component {
     let code = this.refs.editor.getValue();
     let assertion = createAssertion(this.props.assertion);
     let output = [];
+    let {exercise} = this.state;
     try {
       let func = new Function('log, console', code);
       let realLog = console.log;
@@ -92,30 +88,26 @@ export default class JavaScriptExercise extends React.Component {
       console.log = realLog;
       assertion(chai.assert, withoutComments(code), output);
 
-      cache = cache.updateIn(
-        [this.props.slideIndex],
-        cache => cache.set('error', '').set('completed', true)
-      );
+      exercise = {...exercise, error: '', completed: true};
     } catch(ex) {
       let error = ex.name + ': ' + ex.message;
-      cache = cache.updateIn(
-        [this.props.slideIndex],
-        cache => cache
-          .set('error', error)
-          .set('completed', false)
-      );
+      exercise = {...exercise, error, completed: false};
       console.error(error);
     }
-    this.setState({exercise: cache.get(this.props.slideIndex)});
+    Cache.set(this.props.slideIndex, CACHE_KEY, exercise);
+    this.setState({exercise});
   }
 
   _onChange(code) {
-    cache = cache.setIn([this.props.slideIndex, 'code'], code);
-    this.setState({exercise: cache.get(this.props.slideIndex)});
+    let exercise = {...this.state.exercise, code};
+    Cache.set(this.props.slideIndex, CACHE_KEY, exercise);
+    this.setState({exercise});
   }
 
   componentWillReceiveProps(newProps) {
-    this.setState({exercise: ensure(newProps.slideIndex)});
+    this.setState({
+      exercise: Cache.get(newProps.slideIndex, CACHE_KEY, defautExerciseData)
+    });
   }
 
   render() {

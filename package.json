@@ -30,7 +30,6 @@
     "envify": "^3.4.0",
     "flux": "^2.0.3",
     "glob": "^5.0.10",
-    "immutable": "^3.7.3",
     "keypress": "git://github.com/dmauro/Keypress.git",
     "kramed": "^0.4.6",
     "lodash": "^3.9.1",
