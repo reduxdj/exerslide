@@ -1,9 +1,12 @@
 import _ from 'lodash';
 import browserify from 'browserify';
+import babelify from 'babelify';
+import brfs from 'brfs';
 import envify from 'envify/custom';
 import fs from 'fs';
 import path from 'path';
 import transformify from 'transformify';
+import uglifyify from 'uglifyify';
 import watchify from 'watchify';
 import {logProgress, logInfo, logError, logWrite} from './log';
 
@@ -28,9 +31,9 @@ export default function bundleJS(data, options, watchCallback=()=>{}) {
         data.APP_FILE,
         Object.assign({debug: options.watch}, watchify.args)
       )
-      .transform('babelify')
+      .transform(babelify)
       .transform(replaceTransform(data))
-      .transform('brfs')
+      .transform(brfs)
       .on('file', path => files.push(path));
 
     if (options.watch) {
@@ -51,7 +54,7 @@ export default function bundleJS(data, options, watchCallback=()=>{}) {
       });
     } else {
       b.transform({global: true}, envify({NODE_ENV: 'production'}))
-        .transform({global: true}, 'uglifyify');
+        .transform({global: true}, uglifyify);
     }
 
     b.bundle()
