@@ -6,8 +6,17 @@ technologies.
 As such, the focus is on easy content production, with lean styles and less on
 fancy animations.
 
-Exerslide includes specific slide [layouts][] for writing and evaluating
+Exerslide includes specific slide [layouts](#layouts) for writing and evaluating
 JavaScript and HTML.
+
+
+## Example
+
+For a concrete examples of how to use exerslide, have a look at [JavaScript Basics][jsbasics] (and its [output][jsbasics-out]). It demonstrates how to organize slides and override the default styles.
+
+[jsbasics]: https://github.com/fkling/jsbasics
+[jsbasics-out]: http://felix-kling.de/jsbasics/
+
 
 ## API
 
@@ -23,8 +32,8 @@ Options:
    -w, --watch             Monitor slides and static files for changes
 ```
 
+**Usage:**
 
-## Basic Usage
 
 ```sh
 exerslide path/to/slides --out presentation/
@@ -81,8 +90,8 @@ folder.
 
 ### Meta data
 
-Which meta data to provide depends on the [**Layout**][layouts] that is used for
-the slide (more about that later). However, there are some keys which have a
+Which meta data to provide depends on the [**Layout**](#layouts) that is used
+for the slide (more about that later). However, there are some keys which have a
 predefined meaning:
 
 - `title`: The value of `title` will be rendered as an `<h2>` element above the
@@ -115,7 +124,7 @@ Which layout to use for a slide is determined by the following process:
 
 1. The slide's `layout` meta-data field.
 2. If not present, the layout is inferred from the file extension. The mapping
-  can be [configured][configuration].
+  can be [configured](#configuration).
 3. If it can't be inferred, no layout is used. The slide content will be treated as HTML.
 
 Usually it makes sense to set up a default mapping that applies to most slides
@@ -129,7 +138,7 @@ in the project (e.g. by default `.md` maps to the Markdown layout), and use the
 
 Both, the `layout` field and the file extension mapping expect the *layout name*
 as value. These names are used to search for files with the same names in the
-configured search paths for layouts (see [Configuration][]).
+configured search paths for layouts (see [Configuration](#configuration)).
 
 Example: Given the slide
 
@@ -152,7 +161,7 @@ do much: It renders a table-of-contents / progress component and the current
 slide.
 
 Just like other layouts, the master layout is a React component and it can be
-configured which one to use (see [Configuration][]).
+configured which one to use (see [Configuration](#configuration)).
 
 ### Styles
 
