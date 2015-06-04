@@ -8,7 +8,8 @@
     "test": "jest",
     "watch": "babel src --out-dir lib --watch --source-maps inline",
     "build": "babel src --out-dir lib",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "install": "npm run build"
   },
   "keywords": [
     "presentation"
