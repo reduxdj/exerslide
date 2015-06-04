@@ -9,6 +9,12 @@ class MenuItem extends React.Component {
       nextProps.active !== this.props.active;
   }
 
+  componentDidUpdate() {
+    if (this.props.active) {
+      React.findDOMNode(this).scrollIntoView(false);
+    }
+  }
+
   render() {
     let {slideIndex, slide, active} = this.props;
     let classes = {
