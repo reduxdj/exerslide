@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import glob from 'glob';
 
+const PACKAGE_JSON = 'package.json';
 const CONFIG_NAME = '.exersliderc';
 const URL_PATTERN = /^https?:\/\//;
 const PROPS_TO_RESOLVE = [
@@ -50,7 +51,15 @@ export default async function findConfig(dir) {
       dir,
       JSON.parse(await fs.readFileAsync(path.join(dir, CONFIG_NAME)))
     );
-  } else if (dir === '/' || dir === '.' || dir === '..') {
+  } else if(files.indexOf(PACKAGE_JSON) > -1) {
+    let pkg = JSON.parse(
+      await fs.readFileAsync(path.join(dir, PACKAGE_JSON))
+    );
+    if (pkg.exerslide) {
+      return absConfig(dir, pkg.exerslide);
+    }
+  }
+  if (dir === '/' || dir === '.' || dir === '..') {
     return null;
   } else {
     return await findConfig(path.dirname(dir));
