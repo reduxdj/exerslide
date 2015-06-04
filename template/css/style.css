@@ -5,7 +5,7 @@ body {
 /* CODE */
 @font-face {
   font-family: 'source';
-  src: url('SourceCodePro-Regular.otf');
+  src: url('SourceCodePro-regular.otf');
 }
 
 code {
