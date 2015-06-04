@@ -113,7 +113,7 @@ function copyStaticFiles(data, options, files) {
   return copyFiles(
     files || options.config.statics,
     options.outDir,
-    c => _.template(c, data)()
+    c => _.template(c)(data)
   );
 }
 
@@ -123,20 +123,14 @@ async function bundle(options) {
   const LAYOUTS_FILE = path.join(tmpDir, 'layouts.js');
   const CSS_FILE = path.join(options.outDir, 'style.css');
 
-  // This is a multi step process:
-  // - Build the slides array
-  // - Compute dependencies of layout components
-  // - Bundle JS files
-  // - Bundle CSS files
-  // - Copy static files
-
   await prepareSlidesAndLayoutFile(SLIDES_FILE, LAYOUTS_FILE, options);
   let data = {
     SLIDES_FILE,
     LAYOUTS_FILE,
     CSS_FILE,
     APP_FILE,
-    MASTER_LAYOUT_PATH: options.config.masterLayout
+    MASTER_LAYOUT_PATH: options.config.masterLayout,
+    META: options.config.meta
   };
   let [__, jsFiles] = await Promise.join(
     copyStaticFiles(data, options),
@@ -176,6 +170,25 @@ async function bundle(options) {
   }
 }
 
+/**
+ * Short description of the slide generation progress:
+ *
+ * 1. Read default and project configuration and merge them.
+ * 2. Process slides folder:
+ *   - Find all slides
+ *   - Parse them and create JS objects
+ *   - Extract layout information
+ *     (slide objects + default config + project config)
+ *   - Generate JS module for referenced layouts (temp file)
+ *   - Store slide objects  as JSON in a temp file
+ * 3. Copy static files (from default config and project config)
+ * 3. Process JS with browserify, collect information about processed files
+ * 4. Extract @css directives in processed JS files
+ * 5. Bundle CSS (in that order):
+ *  - Component syles (@css directives)
+ *  - Default styles
+ *  - Project styles
+ */
 export default function exerslide(options) {
   options = _.defaults(options, DEFAULT_OPTIONS);
 
