@@ -264,7 +264,7 @@ Currently the following configuration options are supported:
 
 ## CLI options
 
-### `--out`, `-o`
+### `--out-dir`, `-o`
 
 The directory to store the presentation in.
 
