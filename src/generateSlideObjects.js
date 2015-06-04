@@ -78,7 +78,7 @@ export default function generateSlideObjects(folderPath, defaultLayouts) {
         let slides = file.map(file => fileToSlide(file, defaultLayouts));
         let chapter = slides[0].chapter || 'Chapter ' + chapterIndex++;
         slides.map(slide => {
-          if (!slide.chapter && !slide.single) {
+          if (!slide.chapter) {
             slide.chapter = chapter;
           }
           return slide;
