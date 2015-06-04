@@ -26,6 +26,7 @@ pre {
   font-size: 140%;
   left: 350px;
   max-width: 940px;
+  width: calc(100vw - 350px);
   padding: 20px;
   position: absolute;
 }
