@@ -5,9 +5,11 @@ import cssmin from 'cssmin';
 import extractCSSPaths from './extractCSSPaths';
 import fetch from 'node-fetch';
 import fs from 'fs';
+import path from 'path';
 import watchFiles from './watchFiles';
 import {logInfo, logList, logProgress, logWrite, logError} from './log';
 
+let NODE_MODULES_DIR = path.join(__dirname, '../node_modules');
 const URL_PATTERN = /^https?:\/\//;
 
 let watcher;
@@ -67,7 +69,14 @@ async function bundleCSS(filesToBundle, data, options) {
 export default function extractAndBundleCSSFiles(jsFiles, data, options) {
   jsFiles = _.uniq(jsFiles);
   return extractCSSPaths(
-    jsFiles.filter(p => p.indexOf('node_modules/') === -1)
+    // Only inspect direct depends for @css declarations
+    // Ignore exerslide/node_modules if executed in it's own folder
+    jsFiles.filter(p => {
+      let match;
+      return p.indexOf(NODE_MODULES_DIR) === -1 &&
+           (!(match = p.match(/node_modules\//g)) || match.length <= 1);
+    }
+    )
   ).then(cssFilePaths => bundleCSS(
     cssFilePaths.concat(options.config.styles),
     data,
