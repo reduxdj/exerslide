@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import transformify from 'transformify';
 import watchify from 'watchify';
-import {logError, logWrite} from './log';
+import {logProgress, logInfo, logError, logWrite} from './log';
 
 function replaceTransform(data) {
   return transformify(str => {
@@ -23,7 +23,7 @@ function replaceTransform(data) {
 export default function bundleJS(data, options, watchCallback=()=>{}) {
   const BUNDLE = path.join(options.outDir, 'app.js');
   let files = [];
-  return new Promise(resolve => {
+  let promise = new Promise(resolve => {
     let b = browserify(
         data.APP_FILE,
         Object.assign({debug: options.watch}, watchify.args)
@@ -36,6 +36,7 @@ export default function bundleJS(data, options, watchCallback=()=>{}) {
     if (options.watch) {
       b = watchify(b)
       .on('update', () => {
+        logInfo('Bundle JS:\n');
         files = [];
         b.bundle()
         .on('error', function(err) {
@@ -56,8 +57,7 @@ export default function bundleJS(data, options, watchCallback=()=>{}) {
     b.bundle()
     .pipe(fs.createWriteStream(BUNDLE))
     .on('close', resolve);
-  }).then(() => {
-      logWrite(BUNDLE);
-      return files;
-  });
+  }).then(() => files);
+  logProgress('Bundle JS', promise).then(() => logWrite(BUNDLE));
+  return promise;
 }

@@ -8,7 +8,7 @@ import findConfig from './findConfig';
 import path from 'path';
 import tmp from 'tmp';
 import watchFiles from './watchFiles';
-import {logDelete, logMove} from './log';
+import {logProgress, logInfo, logDelete, logMove} from './log';
 
 Promise.promisifyAll(fs);
 
@@ -94,17 +94,28 @@ function copyFiles(files, outDir, mapper) {
   );
 }
 
-async function prepareSlidesAndLayoutFile(slidesPath, layoutPath, options) {
-  let slides = await generateSlideObjects(
-    options.path,
-    options.config.defaultLayouts
-  );
-  fs.writeFileSync(slidesPath, JSON.stringify(slides));
-  let layoutsFile = await generateLayoutsFile(slides, options.config.layouts);
-  fs.writeFileSync(layoutPath, layoutsFile);
-  return slides;
+function prepareSlidesAndLayoutFile(slidesPath, layoutPath, options) {
+  let promise = generateSlideObjects(
+      options.path,
+      options.config.defaultLayouts
+    )
+    .then(slides => {
+      fs.writeFileSync(slidesPath, JSON.stringify(slides));
+      return generateLayoutsFile(slides, options.config.layouts)
+        .then(layoutsFile => fs.writeFileSync(layoutPath, layoutsFile))
+        .then(() => slides);
+    });
+  return logProgress('Processing slides', promise);
 }
 
+function copyStaticFiles(data, options, files) {
+  logInfo('Copying static files:\n');
+  return copyFiles(
+    files || options.config.statics,
+    options.outDir,
+    c => _.template(c, data)()
+  );
+}
 
 async function bundle(options) {
   let tmpDir = tmp.dirSync().name;
@@ -128,11 +139,7 @@ async function bundle(options) {
     MASTER_LAYOUT_PATH: options.config.masterLayout
   };
   let [__, jsFiles] = await Promise.join(
-    copyFiles(
-      options.config.statics,
-      options.outDir,
-      c => _.template(c, data)()
-    ),
+    copyStaticFiles(data, options),
     bundleJS(
       data,
       options,
@@ -149,15 +156,12 @@ async function bundle(options) {
 
   if (options.watch) {
     // statics
+    logInfo('Watching static files:\n');
     watchFiles(options.config.statics, (event, f) => {
       switch(event) {
         case 'add':
         case 'change':
-          copyFiles(
-            options.config.statics,
-            options.outDir,
-            c => _.template(c, data)()
-          );
+          copyStaticFiles(data, options, [f]);
           break;
         case 'unlink':
           deleteFiles([path.join(options.outDir, path.basename(f))]);
@@ -165,6 +169,7 @@ async function bundle(options) {
       }
     });
     // slides
+    logInfo('Watching slides:\n');
     watchFiles(options.path, () => {
       prepareSlidesAndLayoutFile(SLIDES_FILE, LAYOUTS_FILE, options);
     });
