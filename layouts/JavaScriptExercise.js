@@ -54,6 +54,13 @@ export default class JavaScriptExercise extends React.Component {
       thisExercise.error !== nextExercise.error;
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.slideIndex !== prevProps.slideIndex) {
+      // Update the value of the editor
+      this.refs.editor.setValue(this.state.exercise.code || this.props.content);
+    }
+  }
+
   reset() {
     this.refs.editor.setValue(this.props.content);
     let exercise = {
