@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import yaml from 'yaml-js';
 import _ from 'lodash';
+import {logError} from './log';
 
-const DIVIDER = /^-{3,}\n+/m;
 const fileTypes = new Set(['.js', '.html', '.md', '.txt']);
 
 function readFolder(folderPath, withSubfolders=false) {
@@ -24,29 +24,41 @@ function readFolder(folderPath, withSubfolders=false) {
 }
 
 function parseFile(fileContent) {
+  const DIVIDER = /^-{3}\n+/mg;
+
   // try to find YAML front matter
-  if (DIVIDER.test(fileContent)) {
-    let frontMatter = '';
-    let content = '';
-    let match = DIVIDER.exec(fileContent);
-    if (match) {
-      frontMatter = fileContent.substr(0, match.index);
-      content = fileContent.substr(match.index + match[0].length);
+  let frontMatter = '';
+  let content = '';
+  let firstMatch = DIVIDER.exec(fileContent);
+  let hasFrontMatter = firstMatch && firstMatch.index === 0;
+  if (hasFrontMatter) {
+    let secondMatch = DIVIDER.exec(fileContent);
+    if (secondMatch) {
+      frontMatter = fileContent.substring(
+        firstMatch.index + firstMatch[0].length,
+        secondMatch.index
+      );
+      content = fileContent.substr(DIVIDER.lastIndex);
     } else {
-      content = fileContent;
+      throw new Error('Unable to find end of front matter');
     }
-    let slide = {};
-    if (frontMatter) {
-      try {
-        slide = yaml.load(frontMatter);
-      } catch(e) {
-        slide = {};
-      }
-    }
-    slide.content = content;
-    return slide;
+  } else {
+    content = fileContent;
   }
-  return {content: fileContent};
+  let slide = {};
+  if (frontMatter) {
+    try {
+      slide = yaml.load(frontMatter);
+    } catch(err) {
+      /*eslint camelcase: 0, comma-spacing: 0*/
+      let {problem, problem_mark: {line, column}} = err;
+      throw new Error(
+        `YAML error (line ${line}, column ${column}): ${problem}`
+      );
+    }
+  }
+  slide.content = content;
+  return slide;
 }
 
 function detectLayoutFromFileName(fileName, defaultLayouts) {
@@ -54,7 +66,13 @@ function detectLayoutFromFileName(fileName, defaultLayouts) {
 }
 
 function fileToSlide({fileName, fileContent}, defaultLayouts) {
-  let slide = parseFile(fileContent);
+  let slide = {};
+  try {
+    slide = parseFile(fileContent);
+  } catch (err) {
+    logError(`Unable to process "${fileName}": ${err.message}`);
+  }
+
   if (!slide.layout) {
     slide.layout = detectLayoutFromFileName(fileName, defaultLayouts);
   }

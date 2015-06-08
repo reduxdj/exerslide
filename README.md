@@ -48,14 +48,20 @@ dependencies  and will copy all generated files (HTML, JS, CSS) to
 ### Slides
 
 Slides are defined as text files which contain *content* and *meta data*. The
-meta data is defined in the [YAML][] front matter, followed by the content:
+meta data is defined in an optional [YAML][] front matter block, followed by the
+content:
 
 ```text
+---
 title: Title of the slide
 whatever: you want here
 ---
 This is the content
 ```
+
+(basically just like [Jekyll][])
+
+[jekyll]: http://jekyllrb.com/docs/frontmatter/
 
 #### Organizing Slides
 
@@ -143,6 +149,7 @@ configured search paths for layouts (see [Configuration](#configuration)).
 Example: Given the slide
 
 ```txt
+---
 layout: FooBar
 ---
 Some FooBar here.

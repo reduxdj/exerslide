@@ -28,7 +28,7 @@ export function logWrite(p) {
 }
 
 export function logError(err) {
-  process.stderr.write(error(`${err.toString()}\n`));
+  process.stderr.write(error(`\n${err.toString()}\n`));
 }
 
 export function logInfo(msg) {
