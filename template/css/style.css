@@ -78,14 +78,17 @@ pre {
   text-decoration: none;
 }
 
-/* JavaScriptExercise */
+/* Editor */
 
-.CodeMirror {
-  background-color: #f5f5f5;
+.editor {
   border: 1px solid #EEE;
 }
 
-.CodeMirror-gutters {
+.editor > .CodeMirror {
+  background-color: #f5f5f5;
+}
+
+.editor .CodeMirror-gutters {
   background-color: transparent;
   border: 0;
 }

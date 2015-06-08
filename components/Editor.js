@@ -15,7 +15,7 @@ export default class Editor extends React.Component {
 
   componentDidMount() {
     this.codeMirror = CodeMirror( // eslint-disable-line new-cap
-      React.findDOMNode(this.refs.container),
+      React.findDOMNode(this),
       {
         mode: this.props.mode,
         value: this.props.defaultValue,
@@ -46,11 +46,7 @@ export default class Editor extends React.Component {
   }
 
   render() {
-    return (
-      <div id="editor">
-        <div ref="container"/>
-      </div>
-    );
+    return <div className="editor" />;
   }
 
   reset() {
