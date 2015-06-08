@@ -22,10 +22,14 @@ class MenuItem extends React.Component {
       active
     };
     let Layout = getLayoutForSlideAt(slideIndex);
+    let layoutClasses =
+      Layout && Layout.getClassNames && Layout.getClassNames();
 
     return (
       <li
-        className={classnames(classes, Layout.getClassNames(slideIndex))}>
+        className={
+          classnames(classes, layoutClasses)
+        }>
         <a
           href={'#' + this.props.slideIndex}>
           <span className="title">
