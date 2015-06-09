@@ -8,7 +8,7 @@ import findConfig from './findConfig';
 import path from 'path';
 import tmp from 'tmp';
 import watchFiles from './watchFiles';
-import {logProgress, logInfo, logDelete, logMove} from './log';
+import {logError, logProgress, logInfo, logDelete, logMove} from './log';
 
 Promise.promisifyAll(fs);
 
@@ -123,7 +123,12 @@ async function bundle(options) {
   const LAYOUTS_FILE = path.join(tmpDir, 'layouts.js');
   const CSS_FILE = path.join(options.outDir, 'style.css');
 
-  await prepareSlidesAndLayoutFile(SLIDES_FILE, LAYOUTS_FILE, options);
+  try {
+    await prepareSlidesAndLayoutFile(SLIDES_FILE, LAYOUTS_FILE, options);
+  } catch(err) {
+    logError('Unable to process slides: ' + err.message);
+    return;
+  }
   let data = {
     SLIDES_FILE,
     LAYOUTS_FILE,
