@@ -62,7 +62,15 @@ function parseFile(fileContent) {
 }
 
 function detectLayoutFromFileName(fileName, defaultLayouts) {
-  return defaultLayouts[path.extname(fileName)];
+  let extname = '';
+  let ext = '';
+  while ((ext = path.extname(fileName))) {
+    extname = ext + extname;
+    if (defaultLayouts.hasOwnProperty(extname)) {
+      return defaultLayouts[extname];
+    }
+    fileName = fileName.substr(0, fileName.length - ext.length);
+  }
 }
 
 function fileToSlide({fileName, fileContent}, defaultLayouts) {
