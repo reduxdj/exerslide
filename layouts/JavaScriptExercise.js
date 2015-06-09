@@ -1,7 +1,7 @@
 /*eslint no-new-func: 0, new-cap: 0*/
 import Cache from '../js/SlideDataCache';
 import Editor from '../components/Editor';
-import Markdown from '../js/Markdown';
+import Markdown from '../components/Markdown';
 import React from 'react';
 import chai from 'chai';
 import classnames from 'classnames';
@@ -121,12 +121,7 @@ export default class JavaScriptExercise extends React.Component {
     let message;
     let description;
     if (this.props.description) {
-      description =
-        <div
-          dangerouslySetInnerHTML={
-            {__html: Markdown.parse(this.props.description)}
-          }
-        />;
+      description = <Markdown value={this.props.description} />
     }
     let exercise = this.state.exercise;
 

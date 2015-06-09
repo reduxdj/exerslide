@@ -1,5 +1,5 @@
 import React from 'react';
-import Markdown from '../js/Markdown';
+import Markdown from '../components/Markdown';
 
 export default class MarkdownSlide extends React.Component {
   static getClassNames() {
@@ -7,11 +7,7 @@ export default class MarkdownSlide extends React.Component {
   }
 
   render() {
-    return (
-      <div
-        dangerouslySetInnerHTML={{__html: Markdown.parse(this.props.content)}}
-      />
-    );
+    return <Markdown value={this.props.content} />;
   }
 };
 
