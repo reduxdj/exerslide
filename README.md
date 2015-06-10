@@ -258,10 +258,10 @@ Currently the following configuration options are supported:
   [default `index.html`][index.html] file
   contains
     ```html
-    <title><%= META.title %></title>
+    <title><%= meta.title %></title>
     ```
 
-    `<%= META.title %>` will be substituted by the value of `title` in
+    `<%= meta.title %>` will be substituted by the value of `title` in
 
     ```js
     "meta": {

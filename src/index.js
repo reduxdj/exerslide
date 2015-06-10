@@ -2,20 +2,15 @@ import Promise from 'bluebird';
 import _ from 'lodash';
 import bundleJS from './bundleJS';
 import extractAndBundleCSSFiles from './extractAndBundleCSSFiles';
+import * as filePaths from './filePaths';
+import findConfig from './findConfig';
 import fs from 'fs';
 import generateSlideObjects from './generateSlideObjects';
-import findConfig from './findConfig';
 import path from 'path';
-import tmp from 'tmp';
 import watchFiles from './watchFiles';
 import {logError, logProgress, logInfo, logDelete, logMove} from './log';
 
 Promise.promisifyAll(fs);
-
-tmp.setGracefulCleanup();
-
-const TEMPLATE_DIR = path.join(__dirname, '../template');
-const APP_FILE = path.join(__dirname, '../js', 'app.js');
 
 const DEFAULT_OPTIONS = {
   config: {},
@@ -30,7 +25,7 @@ async function resolveLayouts(layouts, layoutDirs) {
   );
   layoutFiles = _.flatten(layoutFiles);
 
-  return layouts.map(layoutName => {
+  return layouts.reduce((layoutMap, layoutName) => {
     let layoutFile;
     for (let i = 0; i < layoutFiles.length; i++) {
       let basename = path.basename(layoutFiles[i]);
@@ -45,11 +40,12 @@ async function resolveLayouts(layouts, layoutDirs) {
         `Unable to find layout "${layoutName}" in ${layoutDirs.toString()}`
       );
     }
-    return layoutFile;
-  });
+    layoutMap[layoutName] = layoutFile;
+    return layoutMap;
+  }, {});
 }
 
-function generateLayoutsFile(slides, layoutDirs) {
+function getLayoutPaths(slides, layoutDirs) {
   let layouts = _.uniq(
     slides
     .map(slide => slide.layout)
@@ -57,15 +53,7 @@ function generateLayoutsFile(slides, layoutDirs) {
     .sort(),
     true
   );
-  return resolveLayouts(layouts, layoutDirs).then(layoutPaths => {
-    return layouts.reduce((lines, name, i) => {
-      lines.push(
-        `import ${name} from '${layoutPaths[i]}';`,
-        `export {${name}};`
-      );
-      return lines;
-    }, []).join('\n');
-  });
+  return resolveLayouts(layouts, layoutDirs);
 }
 
 function deleteFiles(files) {
@@ -94,63 +82,63 @@ function copyFiles(files, outDir, mapper) {
   );
 }
 
-function prepareSlidesAndLayoutFile(slidesPath, layoutPath, options) {
+function prepareSlidesAndConfigFile(options) {
   let promise = generateSlideObjects(
       options.path,
       options.config.defaultLayouts
     )
     .then(slides => {
-      fs.writeFileSync(slidesPath, JSON.stringify(slides));
-      return generateLayoutsFile(slides, options.config.layouts)
-        .then(layoutsFile => fs.writeFileSync(layoutPath, layoutsFile))
+      return getLayoutPaths(slides, options.config.layouts)
+        .then(layoutPaths => {
+          let layoutNames = Object.keys(layoutPaths);
+          let layoutExports = layoutNames.map(
+            name => `import ${name} from '${layoutPaths[name]}';`
+          ).join('\n');
+          layoutExports +=
+            `\nexport const Layouts = {\n${layoutNames.join(',\n')}\n};`;
+
+          let configFileContent = `
+export const slides = ${JSON.stringify(slides)};
+import MasterLayout from '${options.config.masterLayout}';
+export {MasterLayout};
+${layoutExports}`;
+
+          return fs.writeFileAsync(filePaths.CONFIG_FILE, configFileContent);
+        })
         .then(() => slides);
     });
   return logProgress('Processing slides', promise);
 }
 
-function copyStaticFiles(data, options, files) {
+function copyStaticFiles(options, files) {
   logInfo('Copying static files:\n');
   return copyFiles(
     files || options.config.statics,
     options.outDir,
-    c => _.template(c)(data)
+    c => _.template(c, {variable: 'meta'})(options.config.meta)
   );
 }
 
 async function bundle(options) {
-  let tmpDir = tmp.dirSync().name;
-  const SLIDES_FILE = path.join(tmpDir, 'slides.json');
-  const LAYOUTS_FILE = path.join(tmpDir, 'layouts.js');
-  const CSS_FILE = path.join(options.outDir, 'style.css');
-
   try {
-    await prepareSlidesAndLayoutFile(SLIDES_FILE, LAYOUTS_FILE, options);
+    await prepareSlidesAndConfigFile(options);
   } catch(err) {
     logError('Unable to process slides: ' + err.message);
     return;
   }
-  let data = {
-    SLIDES_FILE,
-    LAYOUTS_FILE,
-    CSS_FILE,
-    APP_FILE,
-    MASTER_LAYOUT_PATH: options.config.masterLayout,
-    META: options.config.meta
-  };
   let [__, jsFiles] = await Promise.join(
-    copyStaticFiles(data, options),
+    copyStaticFiles(options),
     bundleJS(
-      data,
       options,
       options.watch ?
         changedJSFiles => {
           jsFiles = _.uniq(jsFiles.concat(changedJSFiles));
-          extractAndBundleCSSFiles(jsFiles, data, options);
+          extractAndBundleCSSFiles(jsFiles, options);
         } :
         null
     )
   );
-  await extractAndBundleCSSFiles(jsFiles, data, options);
+  await extractAndBundleCSSFiles(jsFiles, options);
 
   if (options.watch) {
     // statics
@@ -159,7 +147,7 @@ async function bundle(options) {
       switch(event) {
         case 'add':
         case 'change':
-          copyStaticFiles(data, options, [f]);
+          copyStaticFiles(options, [f]);
           break;
         case 'unlink':
           deleteFiles([path.join(options.outDir, path.basename(f))]);
@@ -169,7 +157,7 @@ async function bundle(options) {
     // slides
     logInfo('Watching slides:\n');
     watchFiles(options.path, () => {
-      prepareSlidesAndLayoutFile(SLIDES_FILE, LAYOUTS_FILE, options);
+      prepareSlidesAndConfigFile(options);
     });
   }
 }
@@ -198,7 +186,7 @@ export default function exerslide(options) {
 
   // Load default and project config
   return Promise.join(
-    findConfig(TEMPLATE_DIR),
+    findConfig(filePaths.TEMPLATE_DIR),
     findConfig(options.path)
   )
   .then(([defaultConfig, projectConfig]) => {

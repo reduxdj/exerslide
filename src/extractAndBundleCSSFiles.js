@@ -20,7 +20,8 @@ function same(a, b) {
   return a.slice().sort().every((v, i) => v === b[i]);
 }
 
-async function bundleCSS(filesToBundle, data, options) {
+async function bundleCSS(filesToBundle, options) {
+  const BUNDLE = path.join(options.outDir, 'style.css');
   filesToBundle = _.uniq(filesToBundle);
   function bundle(files) {
     logInfo('Bundle CSS:\n');
@@ -37,9 +38,9 @@ async function bundleCSS(filesToBundle, data, options) {
         if (!options.watch) {
           css = cssmin(css);
         }
-        return fs.writeFileAsync(data.CSS_FILE, css);
+        return fs.writeFileAsync(BUNDLE, css);
       });
-    logProgress(promise).then(() => logWrite(data.CSS_FILE));
+    logProgress(promise).then(() => logWrite(BUNDLE));
     return promise;
   }
 
@@ -66,7 +67,7 @@ async function bundleCSS(filesToBundle, data, options) {
   return await bundle(filesToBundle);
 }
 
-export default function extractAndBundleCSSFiles(jsFiles, data, options) {
+export default function extractAndBundleCSSFiles(jsFiles, options) {
   jsFiles = _.uniq(jsFiles);
   return extractCSSPaths(
     // Only inspect direct depends for @css declarations
@@ -79,7 +80,6 @@ export default function extractAndBundleCSSFiles(jsFiles, data, options) {
     )
   ).then(cssFilePaths => bundleCSS(
     cssFilePaths.concat(options.config.styles),
-    data,
     options
   ));
 }

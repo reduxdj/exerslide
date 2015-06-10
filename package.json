@@ -38,8 +38,6 @@
     "node-fetch": "^1.2.1",
     "nomnom": "^1.8.1",
     "react": "^0.13.2",
-    "tmp": "0.0.26",
-    "transformify": "^0.1.2",
     "uglifyify": "^3.0.1",
     "watchify": "^3.2.1",
     "yaml-js": "^0.1.1"

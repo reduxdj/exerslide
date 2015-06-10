@@ -1,13 +1,10 @@
-import * as Layout from '${LAYOUTS_FILE}';
 import Actions from './Actions';
 import React from 'react';
 import Slide from '../components/Slide';
 import SlideStore, {EVENTS} from './SlideStore';
-import MasterLayout from '${MASTER_LAYOUT_PATH}';
+import {slides, MasterLayout} from './config';
 import {getLayoutForSlide} from './LayoutHelper';
 import {keypress} from 'keypress';
-
-let fs = require('fs'); // to make brfs happy
 
 function setHash(v) {
   global.location.hash = v;
@@ -43,7 +40,7 @@ class App extends React.Component {
       Actions.transitionFromURL(this.state.currentIndex);
     };
 
-    Actions.setSlides(JSON.parse(fs.readFileSync('${SLIDES_FILE}', 'utf-8')));
+    Actions.setSlides(slides);
     Actions.transitionFromURL(0);
   }
 

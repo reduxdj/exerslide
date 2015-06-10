@@ -1,5 +1,5 @@
 import SlideStore from './SlideStore';
-import * as Layouts from '${LAYOUTS_FILE}';
+import {Layouts} from './config';
 
 export function getLayoutForSlide(slideObj) {
   return slideObj.layout && Layouts[slideObj.layout];
