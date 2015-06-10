@@ -23,7 +23,7 @@ class MenuItem extends React.Component {
     };
     let Layout = getLayoutForSlideAt(slideIndex);
     let layoutClasses =
-      Layout && Layout.getClassNames && Layout.getClassNames();
+      Layout && Layout.getClassNames && Layout.getClassNames(slideIndex);
 
     return (
       <li
