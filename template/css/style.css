@@ -3,13 +3,7 @@ body {
 }
 
 /* CODE */
-@font-face {
-  font-family: 'source';
-  src: url('SourceCodePro-regular.otf');
-}
-
 code {
-  font-family: source;
   color: inherit;
 }
 

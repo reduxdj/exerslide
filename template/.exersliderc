@@ -14,8 +14,7 @@
     ".md": "Markdown"
   },
   "statics": [
-    "index.html",
-    "SourceCodePro-regular.otf"
+    "index.html"
   ],
   "meta": {
     "title": ""
