@@ -14,9 +14,15 @@ export default class Slide extends React.Component {
     }
 
     return (
-      <div id="slide" className={this.props.className}>
+      <div
+        id="slide"
+        className={this.props.className}
+        role="main"
+        aria-label="Slide:"
+        aria-labelledby="slide slide-title">
         {this.props.title ?
           <h2
+            id="slide-title"
             className="title"
             dangerouslySetInnerHTML={{__html: this.props.title}}
           /> :
