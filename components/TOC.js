@@ -12,6 +12,7 @@ class MenuItem extends React.Component {
   componentDidUpdate() {
     if (this.props.active) {
       React.findDOMNode(this).scrollIntoView(false);
+      React.findDOMNode(this.refs.anchor).focus();
     }
   }
 
@@ -24,6 +25,7 @@ class MenuItem extends React.Component {
     let Layout = getLayoutForSlideAt(slideIndex);
     let layoutClasses =
       Layout && Layout.getClassNames && Layout.getClassNames(slideIndex);
+    let title = slide.toc || slide.title || `Slide ${slideIndex + 1}`;
 
     return (
       <li
@@ -31,10 +33,11 @@ class MenuItem extends React.Component {
           classnames(classes, layoutClasses)
         }>
         <a
+          ref="anchor"
+          tabIndex={this.props.active ? 0 : -1}
+          title={title}
           href={'#' + this.props.slideIndex}>
-          <span className="title">
-            {slide.toc || slide.title || `Slide ${slideIndex + 1}`}
-          </span>
+          <span className="title">{title}</span>
         </a>
       </li>
     );

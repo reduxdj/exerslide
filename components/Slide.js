@@ -24,6 +24,7 @@ export default class Slide extends React.Component {
           <h2
             id="slide-title"
             className="title"
+            tabIndex={0}
             dangerouslySetInnerHTML={{__html: this.props.title}}
           /> :
            null

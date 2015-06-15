@@ -31,6 +31,10 @@ pre {
   text-align: center;
 }
 
+#slide > .title:focus {
+  outline: none;
+}
+
 #toc {
   font-size: 120%;
   position: fixed;
